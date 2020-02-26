@@ -4,22 +4,18 @@ namespace BowlingGame.Core.Classes
 {
     public class ScoreCard
     {
-        private List<Frame> _frames; 
+        public List<Frame> Frames { get; }
 
-        public List<Frame> Frames
-        {
-            get { return _frames; }
-        }
         public int Score 
         { 
             get 
             { 
-                if (_frames.Count > 1)
+                if (Frames.Count > 1)
                 {
                     // Last Frame may not have a score due to unrolled strike/spare
-                    return _frames[_frames.Count - 1].Score == null ?
-                        (int)_frames[_frames.Count - 2].Score :
-                        (int)_frames[_frames.Count - 1].Score; 
+                    return Frames[Frames.Count - 1].Score == null ?
+                        (int)Frames[Frames.Count - 2].Score :
+                        (int)Frames[Frames.Count - 1].Score; 
                 }
                 return 0;  
             }
@@ -27,16 +23,20 @@ namespace BowlingGame.Core.Classes
 
         public ScoreCard()
         {
-            _frames = new List<Frame>(); 
+            Frames = new List<Frame>(); 
         }
 
-        public void AddFrame(int? score, bool isStrike, bool isSpare)
+        public void AddFrame(int? score, bool isStrike, bool isSpare,
+            int roll1, int? roll2 = null, int? roll3 = null)
         {
-            _frames.Add(new Frame()
+            Frames.Add(new Frame()
             {
                 Score = score,
                 IsSpare = isSpare,
-                IsStrike = isStrike
+                IsStrike = isStrike,
+                Roll1 = roll1, 
+                Roll2 = roll2,
+                Roll3 = roll3
             });
         }
     }

@@ -17,9 +17,10 @@ namespace BowlingGame.Test
         [TestInitialize]
         public void Initialize()
         {
-            var frameListBuilder = new FrameListBuilder();
-            _game = new Game(frameListBuilder);
-            _game.Start(); 
+            var scoreCardService = new ScoreCardService();
+            var scoreCalcService = new ScoreCalcService();
+            var validatorService = new ValidatorService(); 
+            _game = new Game(scoreCardService, scoreCalcService, validatorService);
         }
 
         [TestCleanup]
@@ -37,6 +38,7 @@ namespace BowlingGame.Test
         [TestMethod]
         public void TestRoll()
         {
+            _game.Start(); 
             _game.Roll(5); 
         }
 
@@ -44,6 +46,7 @@ namespace BowlingGame.Test
         [ExpectedException(typeof(PinsOutOfRangeException))]
         public void TestOutOfRangeRoll()
         {
+            _game.Start(); 
             _game.Roll(11);
         }
 

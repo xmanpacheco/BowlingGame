@@ -1,5 +1,4 @@
 ﻿using BowlingGame.Core.Classes;
-using System.Collections.Generic;
 
 namespace BowlingGame.Core.Interfaces
 {

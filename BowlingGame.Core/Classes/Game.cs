@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using BowlingGame.Core.Exceptions;
 using BowlingGame.Core.Interfaces;
 
@@ -8,22 +6,32 @@ namespace BowlingGame.Core.Classes
 {
     public class Game : IGame
     {
-        private FrameListBuilder _frameListBuilder; 
-        public Game(FrameListBuilder frameListBuilder)
+        private IScoreCardService _scoreCardService;
+        private IScoreCalcService _scoreCalcService;
+        private IValidatorService _validatorService; 
+
+        public Game(IScoreCardService scoreCardService, 
+            IScoreCalcService scoreCalcService,
+            IValidatorService validatorService)
         {
-            _frameListBuilder = frameListBuilder; 
+            _scoreCardService = scoreCardService;
+            _scoreCalcService = scoreCalcService;
+            _validatorService = validatorService; 
         }
+
         private List<int> _rolls;
 
         public void Roll(int pins)
         {
-            ValidatePins(pins);
+            if (!_validatorService.ValidatePins(pins))
+                throw new PinsOutOfRangeException(); 
+
             _rolls.Add(pins);
         }
 
         public ScoreCard ScoreByFrame()
         {
-            return _frameListBuilder.BuildFrameList(_rolls); 
+            return _scoreCardService.BuildFrameList(_rolls); 
         }
 
         public void Start()
@@ -33,27 +41,7 @@ namespace BowlingGame.Core.Classes
 
         public int TotalScore()
         {
-            int score = 0;
-            for (int i = 0; i < _rolls.Count - 1; i += 2)
-            {
-                // simplest case/ non-strike/spare
-                if (_rolls[i] + _rolls[i + 1] < 10)
-                {
-                    score += _rolls[i] + _rolls[i + 1];
-                    continue;
-                }
-
-                if (i + 2 >= _rolls.Count)
-                    break;
-                else
-                {
-                    score += _rolls[i] + _rolls[i + 1] + _rolls[i + 2];
-                    // if strike, increment by one
-                    if (_rolls[i] == 10)
-                        i--;
-                }
-            }
-            return score; 
+            return _scoreCalcService.CalculateScore(_rolls); 
         }
         private static void ValidatePins(int? pins)
         {
