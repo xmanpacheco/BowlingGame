@@ -6,28 +6,45 @@ namespace BowlingGame.Core.Classes
 {
     public class FrameListBuilder
     {
-        public List<Frame> BuildFrameList(int?[] rolls, int toFrame)
+        public ScoreCard BuildFrameList(List<int> _rolls)
         {
-            //for (int i = 0; i <= toFrame-1; i++)
-            //{
-            //    var frame = new Frame();
-            //    int roll1 = rolls[i * 2].GetValueOrDefault(0);
-            //    int roll2 = rolls[(i * 2) + 1].GetValueOrDefault(0);
+            ScoreCard scoreCard = new ScoreCard();
 
-            //    // handle case of non-spare/strike
-            //    if (roll1 + roll2 < 10)
-            //    {
-            //        frame.Score = roll1 + roll2;
-            //    }
+            int score = 0;
+            for (int i = 0; i < _rolls.Count; i += 2)
+            {
+                // simplest case/ non-strike/spare
+                int? roll2 = i + 1 == _rolls.Count ? null : (int?)_rolls[i + 1];
 
-            //    if (roll1 = 10)
-            //    {
-            //        score = 
-            //    }
-            //}
+                if (_rolls[i] + roll2.GetValueOrDefault(0) < 10)
+                {
+                    score += _rolls[i] + roll2.GetValueOrDefault(0);
+                    scoreCard.AddFrame(score, false, false);
+                    continue;
+                }
 
+                // End of rolls, not necessarly end of game
+                if (i + 2 >= _rolls.Count)
+                {
+                    scoreCard.AddFrame(null, _rolls[i] == 10, _rolls[i] != 10);
+                    break;
+                }
+                else  // Strike or Spare
+                {
+                    score += _rolls[i] + _rolls[i + 1] + _rolls[i + 2];
+                    scoreCard.AddFrame(score, _rolls[i] == 10, _rolls[i] != 10);
+                }
 
-            return null; 
+                // prevent an 11th frame with an 11th roll
+                if (scoreCard.Frames.Count == 10)
+                    break;
+
+                // if strike, increment by one
+                if (_rolls[i] == 10)
+                    i--;
+            }
+            return scoreCard;
+
         }
     }
 }

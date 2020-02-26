@@ -8,60 +8,27 @@ namespace BowlingGame.Core.Classes
 {
     public class Game : IGame
     {
+        private FrameListBuilder _frameListBuilder; 
+        public Game(FrameListBuilder frameListBuilder)
+        {
+            _frameListBuilder = frameListBuilder; 
+        }
         private List<int> _rolls;
-        private int _currentRoll; // keep track of rolls
 
         public void Roll(int pins)
         {
             ValidatePins(pins);
             _rolls.Add(pins);
-            _currentRoll++; 
         }
 
         public ScoreCard ScoreByFrame()
         {
-            ScoreCard scoreCard = new ScoreCard(); 
-
-            int score = 0;
-            for (int i = 0; i < _rolls.Count; i += 2)
-            {
-                // simplest case/ non-strike/spare
-                int? roll2 = i + 1 == _rolls.Count ? null : (int?)_rolls[i + 1]; 
-
-                if (_rolls[i] + roll2.GetValueOrDefault(0) < 10)
-                {
-                    score += _rolls[i] + roll2.GetValueOrDefault(0);
-                    scoreCard.AddFrame(score, false, false); 
-                    continue;
-                }
-
-                // End of rolls, not necessarly end of game
-                if (i + 2 >= _rolls.Count)
-                {
-                    scoreCard.AddFrame(null, _rolls[i] == 10, _rolls[i] != 10); 
-                    break;
-                }
-                else  // Strike or Spare
-                {
-                    score += _rolls[i] + _rolls[i + 1] + _rolls[i + 2];
-                    scoreCard.AddFrame(score, _rolls[i] == 10, _rolls[i] != 10); 
-                }
-
-                // prevent an 11th frame with an 11th roll
-                if (scoreCard.Frames.Count == 10)
-                    break;
-
-                // if strike, increment by one
-                if (_rolls[i] == 10 )
-                    i--;
-            }
-            return scoreCard;
+            return _frameListBuilder.BuildFrameList(_rolls); 
         }
 
         public void Start()
         {
             _rolls = new List<int>(); 
-            _currentRoll = 1; // first roll
         }
 
         public int TotalScore()

@@ -17,7 +17,8 @@ namespace BowlingGame.Test
         [TestInitialize]
         public void Initialize()
         {
-            _game = new Game();
+            var frameListBuilder = new FrameListBuilder();
+            _game = new Game(frameListBuilder);
             _game.Start(); 
         }
 
